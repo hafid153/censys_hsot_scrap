@@ -1,7 +1,11 @@
 import subprocess
 
-# Arguments
-arg_for_index = "url"  # remplace par ton argument réel pour index.js
+
+with open('url.txt', 'r',encoding='utf-8') as file :
+    url= str(file.read())
+
+
+arg_for_index = url
 arg1_for_data = "node_js/page_text.txt" # remplace par ton argument réel pour data_processor.py
 arg2_for_data = "hosts.yml" # remplace par ton argument réel pour data_processor.py
 
