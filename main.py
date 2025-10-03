@@ -3,7 +3,7 @@ import subprocess
 # Arguments
 arg_for_index = "url"  # remplace par ton argument réel pour index.js
 arg1_for_data = "node_js/page_text.txt" # remplace par ton argument réel pour data_processor.py
-arg2_for_data = "host.yml" # remplace par ton argument réel pour data_processor.py
+arg2_for_data = "hosts.yml" # remplace par ton argument réel pour data_processor.py
 
 # Lancer index.js avec son argument
 result_node = subprocess.run(['node', 'node_js/index.js', arg_for_index])

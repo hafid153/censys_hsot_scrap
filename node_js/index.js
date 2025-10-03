@@ -19,7 +19,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 (async () => {
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     args: ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage']
   });
 
