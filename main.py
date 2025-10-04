@@ -9,7 +9,7 @@ arg1_for_data = "node_js/page_text.txt"
 arg2_for_data = "hosts.yml" 
 
 
-def fetch_data(url,arg_for_index,arg1_for_data,arg2_for_data):
+def fetch_data(url,arg_for_index):
    
    # run index.js pour avoir le ficheir page_txt.txt
     result_node = subprocess.run(['node', 'node_js/index.js', arg_for_index])
@@ -18,13 +18,22 @@ def fetch_data(url,arg_for_index,arg1_for_data,arg2_for_data):
         print("Erreur lors de l'exécution de index.js")
         exit(1)
 
-    # run dataprocess pour les  metr dans un ficheir .yaml
+def data_process(arg1_for_data,arg2_for_data):
+
+    # run dataprocess pour les  mettre dans un ficheir .yaml
     result_py = subprocess.run(['python', 'data_processor.py', arg1_for_data, arg2_for_data])
     
     if result_py.returncode != 0:
         print("Erreur lors de l'exécution de data_processor.py")
         exit(1)
     
-    print("Les deux scripts ont été exécutés avec succès.")
+def main():
 
-fetch_data(url,arg_for_index,arg1_for_data,arg2_for_data)
+     fetch_data(url,arg_for_index)
+     data_process(arg1_for_data,arg2_for_data)
+
+
+
+if __name__ == "__main__":
+    main()
+   
