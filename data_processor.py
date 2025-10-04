@@ -88,13 +88,9 @@ def write_yaml(hosts, output_file):
 
 
 def run_data_process():
-    '''
-    if len(sys.argv) != 3:
-        print("Usage: python3 extract_censys_yaml.py input.txt output.yml")
-        sys.exit(1)
-    '''
-    input_file ="node_js/page_text.txt" #sys.argv[1]
-    output_file ="hosts.yml" #sys.argv[2]
+
+    input_file ="node_js/page_text.txt" 
+    output_file ="hosts.yml" 
 
     hosts = parse_file(input_file)
     write_yaml(hosts, output_file)
