@@ -33,7 +33,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
       const cookies = JSON.parse(fs.readFileSync(COOKIE_PATH, 'utf8'));
       if (Array.isArray(cookies) && cookies.length) {
         await page.setCookie(...cookies);
-        console.log(`✅ ${cookies.length} cookie(s) chargés depuis ${COOKIE_PATH}`);
+        console.log(`✅ ${cookies.length} cookie(s) chargés  `);
       }
     } catch (e) {
       console.warn('⚠️ Impossible de lire cookies.json :', e.message);
@@ -41,6 +41,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
   }
 
   try {
+    console.log(`⏳ Navigation vers l'url`);
     await page.goto(URL, { waitUntil: 'networkidle2', timeout: 60000 });
     // comportements "humains" simples
     try { await page.mouse.move(100,100); } catch(e) {}
@@ -77,8 +78,8 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
         '[id*="captcha"]',
         '[class*="g-recaptcha"]',
         '.h-captcha',
-        '.cf-turnstile', // possible classes
-        '[data-sitekey]' // sitekey often present on recaptcha/hcaptcha
+        '.cf-turnstile',
+        '[data-sitekey]'
       ];
       const nodes = new Set();
       selectors.forEach(sel => {
@@ -100,7 +101,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
         }
       }
 
-      // 4) Cloudflare UAM indicators in DOM (rare but exist)
+      // 4) Cloudflare UAM indicators in DOM
       if (document.querySelector('#cf-content, .cf-browser-verification')) {
         infos.found = true;
         infos.matches.push({ type: 'cloudflare-uam' });
@@ -158,21 +159,24 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
       return getVisibleText();
     });
 
-    console.log('--- DEBUT TEXTE PAGE ---');
-    if (visibleText && visibleText.length) {
-      console.log(visibleText);
-    } else {
-      console.log('(aucun texte détecté — la page est peut-être très dynamique)');
+    // Toujours sauvegarder le texte visible dans page_text.txt (silencieux — ne pas écrire sur stdout)
+    try {
+      fs.writeFileSync(OUT_TXT, visibleText || '', 'utf8');
+      console.log(`✅ Texte sauvegardé dans ${OUT_TXT}`);
+    } catch (e) {
+      console.error('⚠️ erreur écriture txt', e && e.message ? e.message : e);
     }
-    console.log('--- FIN TEXTE PAGE ---');
 
-    // sauvegarde
-    try { fs.writeFileSync(OUT_TXT, visibleText || '', 'utf8'); console.log(`✅ Texte sauvegardé dans ${OUT_TXT}`); } catch(e){ console.warn('⚠️ erreur écriture txt', e.message); }
+    if (!visibleText || !visibleText.length) {
+      console.error('(aucun texte détecté — la page est peut-être très dynamique)');
+    }
+
     const newCookies = await page.cookies();
-    try { fs.writeFileSync(COOKIE_PATH, JSON.stringify(newCookies, null, 2)); console.log(`✅ Cookies sauvegardés dans ${COOKIE_PATH}`); } catch(e){ console.warn('⚠️ erreur sauvegarde cookies', e.message); }
+    try { fs.writeFileSync(COOKIE_PATH, JSON.stringify(newCookies, null, 2)); console.log(`✅ Cookies sauvegardés dans ${COOKIE_PATH}`); } catch(e){ console.log('⚠️ erreur sauvegarde cookies', e.message); }
 
   } catch (err) {
     console.error('Erreur lors de la navigation :', err && err.message ? err.message : err);
+    process.exit(1);
   } finally {
     await browser.close();
   }
