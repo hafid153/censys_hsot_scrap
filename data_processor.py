@@ -1,21 +1,22 @@
+# data_processor.py
 import re
-import sys
 from collections import OrderedDict
 
 def normalize_service(service):
     service = service.strip().lower()
     return service
 
-def extract_blocks(lines):
+def extract_blocks_from_lines(lines):
     blocks = []
     current_block = []
 
     for line in lines:
-        if re.match(r'^\d{1,3}(?:\.\d{1,3}){3}', line):  # line starts with IP
+        # si la ligne commence par une IP, on démarre un nouveau bloc
+        if re.match(r'^\s*\d{1,3}(?:\.\d{1,3}){3}', line):
             if current_block:
                 blocks.append(current_block)
                 current_block = []
-        current_block.append(line)
+        current_block.append(line.rstrip())
     if current_block:
         blocks.append(current_block)
 
@@ -25,7 +26,7 @@ def parse_block(block):
     data = OrderedDict()
     block_text = " ".join(block)
 
-    # IP & hostname
+    # IP & hostname (ex: "1.2.3.4 (hostname.example)")
     m_ip = re.match(r'^\s*(\d{1,3}(?:\.\d{1,3}){3})(?:\s*\((.*?)\))?', block[0])
     if m_ip:
         data['ip'] = m_ip.group(1)
@@ -35,32 +36,35 @@ def parse_block(block):
         return None  # skip invalid block
 
     # ASN (e.g., "UPCLOUD (202053)")
-    m_asn = re.search(r'([A-Z0-9\-\. ]+)\s*\((\d{1,6})\)', block_text)
+    m_asn = re.search(r'([A-Z0-9\-\.\s]+)\s*\((\d{1,6})\)', block_text, re.I)
     data['asn'] = f"{m_asn.group(1).strip()} ({m_asn.group(2)})" if m_asn else None
 
     # Location (e.g., "Stockholm, Sweden")
     m_loc = re.search(r'([A-Za-z\-\.\' ]+,\s*[A-Za-z\-\.\' ]+)', block_text)
     data['location'] = m_loc.group(1).strip() if m_loc else None
 
-    # Ports (look for all PORT/SERVICE patterns)
+    # Ports (look for PORT/SERVICE patterns like "22/ssh" or "80/http")
     port_matches = re.findall(r'(\d{1,5})/([A-Za-z0-9\-_\.]+)', block_text)
     ports = []
     for port, service in port_matches:
-        ports.append({
-            'port': int(port),
-            'service': normalize_service(service)
-        })
+        try:
+            ports.append({
+                'port': int(port),
+                'service': normalize_service(service)
+            })
+        except ValueError:
+            continue
 
     data['ports'] = ports if ports else []
     return data
 
-def parse_file(filename):
-    with open(filename, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-
-    blocks = extract_blocks(lines)
+def parse_text(text):
+    if text is None:
+        return []
+    # split into lines and remove empty lines
+    lines = [l for l in text.splitlines() if l.strip() != ""]
+    blocks = extract_blocks_from_lines(lines)
     hosts = []
-
     for block in blocks:
         entry = parse_block(block)
         if entry:
@@ -86,15 +90,12 @@ def write_yaml(hosts, output_file):
             else:
                 f.write("      - {}\n")
 
-
-def run_data_process():
-
-    input_file ="node_js/page_text.txt" 
-    output_file ="hosts.yml" 
-
-    hosts = parse_file(input_file)
+def run_data_process(data):
+    """
+    data: str (texte brut capturé)
+    Génère hosts.yml dans le répertoire courant.
+    """
+    output_file = "hosts.yml"
+    hosts = parse_text(data)
     write_yaml(hosts, output_file)
     print(f"[✓] {len(hosts)} hosts parsed and written to {output_file}")
-
-if __name__ == "__main__":
-    run_data_process()
