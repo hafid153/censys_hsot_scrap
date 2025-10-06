@@ -15,25 +15,29 @@
 1. **Prepare URL file**  
    Create a file named `url.txt` in the project root and add the target URL inside.
 
-2. **Install Node.js dependencies**  
+2. **Install Node.js dependencies**
    ```bash
    cd node_js/
    npm install
    cd ..
+   ```
 
 3. **Create and activate Python virtual environment**
-    '''bash
-    python -m venv project-env
-    source project-env/bin/activate
+   ```bash
+   python -m venv project-env
+   source project-env/bin/activate
+   ```
 
 4. **Install Python dependencies**
-   '''bash
+   ```bash
    pip install -r requirements.txt
+   ```
 
 ## Usage 
-   '''bash
+   ```bash
    python main.py
+   ```
    
 # Result 
-	The script will generate a hosts.yml file containing the hosts and thiers port : serivce 
+   The script will generate a hosts.yml file containing the hosts and thiers port : serivce 
 
