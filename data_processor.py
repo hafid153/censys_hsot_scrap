@@ -1,4 +1,3 @@
-# data_processor.py
 import re
 from collections import OrderedDict
 
@@ -11,7 +10,7 @@ def extract_blocks_from_lines(lines):
     current_block = []
 
     for line in lines:
-        # si la ligne commence par une IP, on démarre un nouveau bloc
+        
         if re.match(r'^\s*\d{1,3}(?:\.\d{1,3}){3}', line):
             if current_block:
                 blocks.append(current_block)
@@ -26,24 +25,24 @@ def parse_block(block):
     data = OrderedDict()
     block_text = " ".join(block)
 
-    # IP & hostname (ex: "1.2.3.4 (hostname.example)")
+    
     m_ip = re.match(r'^\s*(\d{1,3}(?:\.\d{1,3}){3})(?:\s*\((.*?)\))?', block[0])
     if m_ip:
         data['ip'] = m_ip.group(1)
         hostname = m_ip.group(2)
         data['hostname'] = hostname if hostname else None
     else:
-        return None  # skip invalid block
+        return None  
 
-    # ASN (e.g., "UPCLOUD (202053)")
+    
     m_asn = re.search(r'([A-Z0-9\-\.\s]+)\s*\((\d{1,6})\)', block_text, re.I)
     data['asn'] = f"{m_asn.group(1).strip()} ({m_asn.group(2)})" if m_asn else None
 
-    # Location (e.g., "Stockholm, Sweden")
+    
     m_loc = re.search(r'([A-Za-z\-\.\' ]+,\s*[A-Za-z\-\.\' ]+)', block_text)
     data['location'] = m_loc.group(1).strip() if m_loc else None
 
-    # Ports (look for PORT/SERVICE patterns like "22/ssh" or "80/http")
+    
     port_matches = re.findall(r'(\d{1,5})/([A-Za-z0-9\-_\.]+)', block_text)
     ports = []
     for port, service in port_matches:
@@ -61,7 +60,7 @@ def parse_block(block):
 def parse_text(text):
     if text is None:
         return []
-    # split into lines and remove empty lines
+
     lines = [l for l in text.splitlines() if l.strip() != ""]
     blocks = extract_blocks_from_lines(lines)
     hosts = []
@@ -90,12 +89,8 @@ def write_yaml(hosts, output_file):
             else:
                 f.write("      - {}\n")
 
-def run_data_process(data):
-    """
-    data: str (texte brut capturé)
-    Génère hosts.yml dans le répertoire courant.
-    """
-    output_file = "hosts.yml"
+def run_data_process(data,output_file):
+    
     hosts = parse_text(data)
     write_yaml(hosts, output_file)
     print(f"[✓] {len(hosts)} hosts parsed and written to {output_file}")
