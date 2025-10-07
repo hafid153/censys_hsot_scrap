@@ -6,10 +6,10 @@ const path = require('path');
 
 puppeteer.use(StealthPlugin());
 
-const COOKIE_PATH = path.resolve(__dirname, 'cookies.json');
-const OUT_TXT = path.resolve(__dirname, 'page_text.txt');
-const OUT_HTML = path.resolve(__dirname, 'page_dump.html');
-const SCREENSHOT = path.resolve(__dirname, 'page_debug.png');
+const COOKIE_PATH = path.resolve(__dirname, 'session_info/cookies.json');
+const OUT_TXT = path.resolve(__dirname, 'data/page_text.txt');
+const OUT_HTML = path.resolve(__dirname, 'session_info/page_dump.html');
+const SCREENSHOT = path.resolve(__dirname, 'session_info/page_debug.png');
 
 const argv = process.argv.slice(2);
 const URL = argv.find(a => !a.startsWith('--')) || 'https://example.com';

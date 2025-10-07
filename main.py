@@ -5,7 +5,7 @@ import os
 from data_processor import run_data_process
 
 URL_FILE = 'url.txt'
-PAGE_TEXT = os.path.join('node_js', 'page_text.txt')
+PAGE_TEXT = os.path.join('node_js','data','page_text.txt')
 
 def read_url():
     if not os.path.exists(URL_FILE):
