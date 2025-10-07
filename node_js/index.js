@@ -11,6 +11,20 @@ const OUT_TXT = path.resolve(__dirname, 'data/page_text.txt');
 const OUT_HTML = path.resolve(__dirname, 'session_info/page_dump.html');
 const SCREENSHOT = path.resolve(__dirname, 'session_info/page_debug.png');
 
+// check if subfolders exist or create it 
+const dataFolder = path.resolve(__dirname, 'data');
+const sessionFolder = path.resolve(__dirname, 'session_info');
+
+if (!fs.existsSync(dataFolder)) {
+  fs.mkdirSync(dataFolder, { recursive: true });
+  console.log('Dossier data créé');
+}
+
+if (!fs.existsSync(sessionFolder)) {
+  fs.mkdirSync(sessionFolder, { recursive: true });
+  console.log('Dossier session_info créé');
+}
+
 const argv = process.argv.slice(2);
 const URL = argv.find(a => !a.startsWith('--')) || 'https://example.com';
 const FORCE = argv.includes('--force');
