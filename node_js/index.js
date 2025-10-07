@@ -7,7 +7,6 @@ const path = require('path');
 puppeteer.use(StealthPlugin());
 
 const COOKIE_PATH = path.resolve(__dirname, 'session_info/cookies.json');
-const OUT_TXT = path.resolve(__dirname, 'data/page_text.txt');
 const OUT_HTML = path.resolve(__dirname, 'session_info/page_dump.html');
 const SCREENSHOT = path.resolve(__dirname, 'session_info/page_debug.png');
 
@@ -25,9 +24,20 @@ if (!fs.existsSync(sessionFolder)) {
   console.log('Dossier session_info créé');
 }
 
+// output file visible text will be save with file_name passed as second argv 
 const argv = process.argv.slice(2);
-const URL = argv.find(a => !a.startsWith('--')) || 'https://example.com';
+
+const URL = argv[0];
+const OUTPUT_FILENAME = argv[1];
 const FORCE = argv.includes('--force');
+
+if (!URL || !OUTPUT_FILENAME) {
+  console.error('❌ Usage : node index.js <url> <nom_fichier.txt>');
+  process.exit(1);
+}
+
+const OUT_TXT = path.resolve(__dirname, 'data', OUTPUT_FILENAME);
+
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
