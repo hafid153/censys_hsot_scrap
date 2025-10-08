@@ -13,7 +13,7 @@
 ## Installation & Setup
 
 1. **Prepare URL file**  
-   Create a file named `url.txt` in the project root and add the target URL inside.
+   Create a file named `url.txt` in the project root and add the target URLs, one per line.
 
 2. **Install Node.js dependencies**
    ```bash
@@ -39,5 +39,5 @@
    ```
    
 # Result 
-   The script will generate a hosts.yml file containing the hosts and thiers port : serivce 
+   The script will generate a `YAML` file in the `data/` directory at the project root for each URL, containing the hosts and their ports/services 
 
